@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Metadata and resources
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <title>{{ .event }} {{ .title }}</title>
+    <style>
+        html {
+            display: none;
+        }
+    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="container">
+        <div class="nav">
+            <h1>DWAYNE-INATOR-5000</h1>
+            <div>
+                {{ if .user.IsValid }}
+                    {{ if and (not .user.IsAdmin) (not .user.IsRed) }}
+                    <a href="/team/{{ .user.Identifier }}">team</a>
+                    {{ end }}
+                    {{ if .user.IsRed }}
+                    <a href="/red">red</a>
+                    {{ else }}
+                    <a href="/injects">injects</a>
+                    {{ end }}
+                {{ end }}
+                <a href="/">status</a>
+                {{ if or .m.Verbose (or .user.IsAdmin .user.IsRed) }}
+                <a href="/scores">scores</a>
+                {{ end }}
+                {{ if .user.IsValid }}
+                <a href="/logout">logout</a>
+                {{ else }}
+                <a href="/login">login</a>
+                {{ end }}
+            </div>
+        </div>
+        <hr>

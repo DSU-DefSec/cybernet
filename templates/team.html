@@ -1,0 +1,137 @@
+{{ template "head.html" . }}
+
+{{ $m := .m }}
+{{ $loc := .loc }}
+{{ $team := .team }}
+
+{{ template "refresh.html" }}
+
+<br>
+<h2>{{ .team.Identifier }}</h2>
+
+<br>
+<h2>Status</h2>
+
+<br>
+<table>
+    <tr>
+        {{ range $box := .m.Box }}
+        <th colspan="{{ len .CheckList }}"> {{ .Name }}</th>
+        {{ end }}
+    </tr>
+    {{ template "boxlist.html" .m }}
+    <tr>
+        {{ if .record }}
+            {{ range $check := .record.Checks }}
+            <td>
+                <a href="/team/{{ $check.Team }}/{{ $check.Name }}">
+                {{ template "bool.html" .Status }}
+                </a>
+            </td>
+            {{ end }}
+        {{ end }}
+    </tr>
+</table>
+
+<br>
+<br>
+<h2>History</h2>
+<p style="text-align: center"><i>(last {{ .limit }} rounds)</i></p>
+<br>
+
+<table class="checks">
+    <tr>
+        <th></th>
+        <th></th>
+        {{ range $box := .m.Box }}
+        <th colspan="{{ len .CheckList }}"> {{ .Name }}</th>
+        {{ end }}
+    </tr>
+    {{ if not $m.Tightlipped }}
+    <th>Round</th>
+    {{ end }}
+    <th>Time</th>
+    {{ template "boxlist.html" .m }}
+
+    {{ if .history }}
+        {{ range $index, $record := .history }}
+        <tr>
+            {{ if not $m.Tightlipped }}
+            <td>{{ .Round }}</td>
+            {{ end }}
+            <td>
+                {{ if eq $index 0 }}
+                    <b>Current</b>
+                {{ else }}
+                    {{ (.Time.In $loc).Format "03:04:05 PM" }}
+                {{ end }}
+            </td>
+        {{ range $check := $record.Checks }}
+            <td>
+                <a href="/team/{{ $check.Team }}/{{ $check.Name }}">
+                {{ template "bool.html" .Status }}
+                </a>
+            </td>
+        {{ end }}
+        </tr>
+        {{ end }}
+    {{ end }}
+</table>
+
+{{ if not $m.Tightlipped }}
+<br>
+<br>
+<h2>External IPs and Ports</h2>
+<br>
+<table class="checks">
+    <tr>
+        {{ range $box := .m.Box }}
+        <th colspan="{{ len .CheckList }}"> {{ .Name }}</th>
+        {{ end }}
+    </tr>
+    <tr>
+        {{ range $box := .m.Box }}
+        <td style="text-align: center" colspan="{{ len .CheckList }}">{{ $m.GetFullIp .Ip $team.Ip }}</td>
+        {{ end }}
+    </tr>
+
+    {{ template "boxlist.html" .m }}
+
+    <tr>
+    {{ range $box := $m.Box }}
+        {{ range $check := .CheckList }}
+            {{ if eq .Port 0 }}
+            <td>N/A</td>
+            {{ else }}
+            <td>{{ .Port }}</td>
+            {{ end }}
+        {{ end }}
+    {{ end }}
+    </tr>
+
+</table>
+{{ end }}
+
+{{ if $m.Verbose }}
+<br>
+<br>
+<fieldset>
+<p>
+    Service points: {{ .record.ServicePoints }}
+
+    <br>
+    Inject points: {{ .record.InjectPoints }}
+
+    <br>
+    SLA Violations: {{ .record.SlaViolations }}
+
+    <br>
+    <b>Total points</b>: {{ .record.Total }}
+
+    <br>
+    <a href="/export/{{ .record.Team }}">Export team data</a>
+</p>
+</fieldset>
+{{ end }}
+
+{{ template "feet.html" }}
