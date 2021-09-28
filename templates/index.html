@@ -1,74 +1,25 @@
 {{ template "head.html" . }}
 
-{{ $m := .m }}
-{{ $admin := .admin }}
-{{ $team := .team }}
-{{ $records := .records }}
-
-{{ template "refresh.html" }}
-
 <br>
-<h2>Status</h2>
+<h2>Competitions</h2>
 
-<br>
-<table>
-    <tr>
-        <th style="border-bottom: none"></th>
-        {{ range $box := .m.Box }}
-        <th colspan="{{ len .CheckList }}"> {{ .Name }}</th>
-        {{ end }}
-    </tr>
-    <tr>
-    <th></th>
-    {{ template "boxlist.html" $m }}
-    </tr>
-    {{ range $index, $record := $records }}
-    <tr>
-        <td class="teamname">
-            {{ if $team }}
-                {{ if $m.IsValid $team .Team }}
-                <a href="/team/{{ .Team }}">
-                {{ end }}
-            {{ end }}
-            {{ .Team }}
-            {{ if $team }}
-                {{ if $m.IsValid $team .Team }}
-                    </a>
-                {{ end }}
-            {{ end }}
-        </td>
-        {{ range $check := .Checks }}
-        <td>
-        {{ if $team }}
-            {{ if $m.IsValid $team $record.Team }}
-            <a href="/team/{{ $record.Team }}/{{ $check.Name }}">
-            {{ end }}
-        {{ end }}
-        {{ template "bool.html" $check.Status }}
-        {{ if $team }}
-            {{ if $m.IsValid $team $record.Team }}
-            </a>
-            {{ end }}
-        {{ end }}
-        </td>
-        {{ end }}
-    </tr>
-    {{ end }}
-</table>
+{{ if .active }}
 
-{{ if .records }}
-<br>
-<p style="text-align: center">
-Checks ran at {{ ((index .records 0).Time.In .loc).Format "03:04:05 PM" }}.
-</p>
+{{ range .active }}
+{{ template "comp.html" . }}
 {{ end }}
 
-{{ if .ip }}
-    {{ if not (or (eq .ip "::1") (eq .ip "127.0.0.1")) }}
-    <p style="text-align: center; font-size: 0.8em">
-    👋 Hello {{ .ip }}!
-    </p>
-    {{ end }}
 {{ end }}
+
+{{ if .past }}
+
+{{ range .past }}
+{{ template "comp.html" . }}
+{{ end }}
+
+{{ end }}
+
+{{ template "message.html" .message }}
+{{ template "error.html" .error }}
 
 {{ template "feet.html" }}

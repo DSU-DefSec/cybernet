@@ -1,0 +1,64 @@
+{{ template "head.html" . }}
+
+
+<br>
+<h2>Profile</h2>
+
+{{ if or (eq .user.Username .userProfile.Username) (.user.Admin) }}
+{{ $u := .userProfile }}
+<fieldset style="display: flex; justify-content: flex-center;">
+    <legend><h1>Edit Profile</h1></legend>
+    <form method="POST" action="/users/{{ $u.Username }}">
+        <div class="group">
+            <input type="hidden" name="username" value="{{ $u.Username}}"></input>
+            <div class="row">
+                <label for="username">Username</label>
+                <input type="text" name="username" disabled value="{{ $u.Username}}"></input>
+            </div>
+            <div class="row">
+                <label>Email</label>
+                <input type="text" value="{{ $u.Email }}" name="email"></input>
+            </div>
+            <div class="row">
+                <label>IALab</label>
+                <input type="text" value="{{ $u.IALab }}" name="ialab"></input>
+            </div>
+            <div class="row">
+                <label>Discord</label>
+                <input type="text" value="{{ $u.Discord }}" name="discord"></input>
+            </div>
+            <div class="row">
+                <label>Notes</label>
+                <input type="text" value="{{ $u.Notes }}" name="notes"></textarea>
+            </div>
+            {{ if .user.Admin }}
+            <div class="row">
+                <label>Disable</label>
+                <input type="checkbox" name="disable"></textarea>
+            </div>
+            {{ end }}
+        </div>
+        <input class="button" type="submit" value="Save"/>
+    </form>
+</fieldset>
+<br>
+{{ else }}
+
+<table>
+    <tr>
+        <td>
+            Username
+        </td>
+        <td>
+            {{ .userProfile.Username }}
+        </td>
+    </tr>
+</table>
+
+{{ end }}
+
+
+{{ template "message.html" .message }}
+{{ template "error.html" .error }}
+
+{{ template "feet.html" }}

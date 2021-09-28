@@ -1,0 +1,84 @@
+<table>
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            {{ .Title }}
+        </td>
+    </tr>
+    <!--
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            {{ .Title }}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            {{ .Title }}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            {{ .Title }}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Title
+        </td>
+        <td>
+            {{ .Title }}
+        </td>
+    </tr>
+     -->
+    {{ if .Notes }}
+    <tr>
+        <td>
+            Notes
+        </td>
+        <td>
+            {{ .Notes }}
+        </td>
+    </tr>
+    {{ end }}
+
+    {{ if .LinkOne }}
+    <tr>
+        <td>
+            Link
+        </td>
+        <td>
+            <a href="{{ .LinkOne }}">{{ .LinkOne }}</a>
+        </td>
+    </tr>
+    {{ end }}
+
+    {{ if .LinkTwo }}
+    <tr>
+        <td>
+            Link
+        </td>
+        <td>
+            <a href="{{ .LinkTwo }}">{{ .LinkTwo }}</a>
+        </td>
+    </tr>
+    {{ end }}
+    <tr>
+        <td>
+            Join!
+        </td>
+        <td>
+            <a href="/join/{{ .ID  }}">Join</a>
+        </td>
+    </tr>
+</table>

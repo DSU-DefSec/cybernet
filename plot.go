@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"fmt"
 	"math/rand"
@@ -10,7 +11,6 @@ import (
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 )
-
 func graphScores(records []teamRecord) {
 	if dwConf.Tightlipped {
 		fmt.Println("graphScores: can't create image, tightlipped mode enabled")
@@ -64,3 +64,5 @@ func getTeamPoints(team string) plotter.XYs {
 	}
 	return pts
 }
+
+*/

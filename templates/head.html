@@ -3,36 +3,27 @@
 <head>
     <!-- Metadata and resources
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-    <title>{{ .event }} {{ .title }}</title>
-    <style>
-        html {
-            display: none;
-        }
-    </style>
+    <title>{{ .title }} - CyberNet</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/normalize.css">
+    <link rel="stylesheet" href="/assets/styles.css">
+    <link rel="icon" type="image/ico" href="/assets/favicon.ico"/>
 </head>
 
 <body>
     <div class="container">
         <div class="nav">
-            <h1>DWAYNE-INATOR-5000</h1>
+            <h1><a href="/">CyberNet</a></h1>
             <div>
-                {{ if .user.IsValid }}
-                    {{ if and (not .user.IsAdmin) (not .user.IsRed) }}
-                    <a href="/team/{{ .user.Identifier }}">team</a>
-                    {{ end }}
-                    {{ if .user.IsRed }}
-                    <a href="/red">red</a>
-                    {{ else }}
-                    <a href="/injects">injects</a>
-                    {{ end }}
-                {{ end }}
-                <a href="/">status</a>
-                {{ if or .m.Verbose (or .user.IsAdmin .user.IsRed) }}
-                <a href="/scores">scores</a>
+                <a href="/">comps</a>
+                {{ if .user.Admin }}
+                <a href="/new">new</a>
+                <a href="/config">config</a>
                 {{ end }}
                 {{ if .user.IsValid }}
+                <a href="/users">users</a>
+                <a href="/users/{{ .user.Username }}">profile</a>
                 <a href="/logout">logout</a>
                 {{ else }}
                 <a href="/login">login</a>

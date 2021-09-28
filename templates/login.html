@@ -3,18 +3,26 @@
 <br>
 <br>
 <div style="display: flex; justify-content: flex-center;">
-    <form style="display: block; margin: 0 auto;" method="POST" action="/login">
-    <h1>Login</h1>
-        <div>
-            <input type="text" name="username" placeholder="Username"></input>
-        </div>
-        <div>
-            <input type="password" name="password" placeholder="Password"></input>
-        </div>
-        <input type="submit" value="Login"/>
-    </form>
+    <fieldset>
+        <legend><h1>Login</h1></legend>
+        <form method="POST" action="/login">
+            <div>
+                <input type="text" name="username" placeholder="Username"></input>
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password"></input>
+            </div>
+            <input type="submit" value="Login"/>
+        </form>
+    </fieldset>
 </div>
 <br>
+
+<p class="msg">
+Don't have an account? <a href="/register">Register here</a>.
+</p>
+
+{{ template "message.html" .message }}
 {{ template "error.html" .error }}
 
 {{ template "feet.html" }}

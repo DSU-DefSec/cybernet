@@ -1,0 +1,25 @@
+{{ template "head.html" . }}
+
+<br>
+<div style="display: flex; justify-content: flex-center;">
+    <fieldset>
+        <legend><h1>Register</h1></legend>
+        <form method="POST" action="/register">
+            <div>
+                <input type="text" name="username" {{ if .username }}value="{{ .username }}"{{ end }} placeholder="Username"></input>
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password"></input>
+            </div>
+            <div>
+                <input type="secret" name="secret" {{ if .secret }}value="{{ .secret }}"{{ end }} placeholder="Secret"></input>
+            </div>
+            <input type="submit" value="Register"/>
+        </form>
+    </fieldset>
+</div>
+<br>
+
+{{ template "error.html" .error }}
+
+{{ template "feet.html" }}

@@ -1,0 +1,25 @@
+{{ template "head.html" . }}
+
+<br>
+<div style="display: flex; justify-content: flex-center;">
+    <fieldset>
+        <legend><h1>Setup</h1></legend>
+        <form style="display: block; margin: 0 auto;" method="POST" action="/setup">
+            <div>
+                <input type="text" name="username" placeholder="Username"></input>
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password"></input>
+            </div>
+            <input type="submit" value="Setup"/>
+        </form>
+    </fieldset>
+</div>
+
+<p class="msg">This is the initial setup page for CyberNet. Welcome! Please configure initial administrator creds below.</p>
+
+<br>
+
+{{ template "error.html" .error }}
+
+{{ template "feet.html" }}
