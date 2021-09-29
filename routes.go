@@ -41,25 +41,41 @@ func editProfile(c *gin.Context) {
 
 func joinEvent(c *gin.Context) {
 	user := getUser(c)
-	id, err := strconv.Atoi(c.PostForm("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": err}))
+		return
+	}
+	signup := &SignUp{}
+	result := db.Limit(1).Find(signup, "event_id = ? and user = ?", id, user.Username)
+	if result.Error != nil {
 		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": result.Error}))
 		return
 	}
-	var signup = *SignUp
-	db.Limit(1).Find(signup, "event_id = ? and username = ?", id, user.Username)
+
 	if signup.User != "" {
 		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": errors.New("You already signed up!")}))
 		return
 	}
 
-	signup = &SignUp{
-		Username: user.Username,
-		EventID:  id,
+	if user.IALab == "" {
+		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": errors.New("You need to configure your IALab username!")}))
+		return
 	}
-	result := db.Create(signup)
 
-	c.HTML(http.StatusOK, "index.html", pageData(c, "Scoreboard", gin.H{}))
+	signup = &SignUp{
+		User: user.Username,
+		EventID: uint(id),
+	}
+	result = db.Create(signup)
+	if result.Error != nil {
+		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": result.Error}))
+		return
+	}
+
+	apiDeploy("2021-CyberStorm-MobPsycho", []string{user.IALab})
+
+	c.HTML(http.StatusOK, "index.html", pageData(c, "Scoreboard", gin.H{"message": "Sign up successful!"}))
 }
 
 func exportProfile(c *gin.Context) {

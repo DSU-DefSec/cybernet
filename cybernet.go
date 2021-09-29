@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -123,7 +124,7 @@ func main() {
 			}
 
 			attendees := &[]User{}
-			result := db.Where("event_id = ?", id).Find(event)
+			result = db.Where("event_id = ?", id).Find(event)
 			if result.Error != nil {
 				c.HTML(http.StatusOK, "index.html", pageData(c, "Events", gin.H{"error": result.Error}))
 				return

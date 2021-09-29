@@ -2,11 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
+	"log"
+	"bytes"
+	"io/ioutil"
 	"fmt"
 )
 
 var (
-	APIEndpoint = ""
+	APIEndpoint = "http://localhost:8000"
 	APIKey      = "yeet"
 )
 
@@ -15,16 +19,20 @@ func apiDeploy(vapp string, variants []string) string {
 		VApp:     vapp,
 		Variants: variants,
 	}
-	var jsonData = json.Encode(deployObj)
+	jsonData, err := json.Marshal(deployObj)
+	if err != nil {
+		log.Println("ERROR:", err)
+		return ""
+	}
 
-	request, error := http.NewRequest("POST", APIEndpoint+"/deploy", bytes.NewBuffer(jsonData))
+	request, err := http.NewRequest("POST", APIEndpoint+"/deploy", bytes.NewBuffer(jsonData))
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("X-Api-Key", "yeet")
 
 	client := &http.Client{}
-	response, error := client.Do(request)
-	if error != nil {
-		log.Println("ERROR:", error)
+	response, err := client.Do(request)
+	if err != nil {
+		log.Println("ERROR:", err)
 		return ""
 	}
 	defer response.Body.Close()
@@ -33,4 +41,5 @@ func apiDeploy(vapp string, variants []string) string {
 	fmt.Println("response Headers:", response.Header)
 	body, _ := ioutil.ReadAll(response.Body)
 	fmt.Println("response Body:", string(body))
+	return ""
 }
