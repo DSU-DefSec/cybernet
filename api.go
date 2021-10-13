@@ -1,29 +1,33 @@
 package main
 
 import (
-	"encoding/json"
-	"net/http"
-	"log"
 	"bytes"
-	"io/ioutil"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
 var (
-	APIEndpoint = "http://localhost:8000"
+	APIEndpoint = "http://172.16.1.121:8000"
 	APIKey      = "yeet"
 )
 
-func apiDeploy(vapp string, variants []string) string {
+func apiDeploy(template, catalog string, variants []string) string {
 	deployObj := DeployRequest{
-		VApp:     vapp,
-		Variants: variants,
+		Template:  template,
+		Catalog:   catalog,
+		Variants:  variants,
+		MakeOwner: true,
 	}
 	jsonData, err := json.Marshal(deployObj)
 	if err != nil {
 		log.Println("ERROR:", err)
 		return ""
 	}
+
+	fmt.Println("json data is", string(jsonData))
 
 	request, err := http.NewRequest("POST", APIEndpoint+"/deploy", bytes.NewBuffer(jsonData))
 	request.Header.Set("Content-Type", "application/json")

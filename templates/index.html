@@ -5,17 +5,17 @@
 
 {{ if .active }}
 
-{{ range .active }}
-{{ template "comp.html" . }}
-{{ end }}
+	{{ range .active }}
+		{{ template "comp.html" . }}
+	{{ end }}
 
 {{ end }}
 
 {{ if .past }}
 
-{{ range .past }}
-{{ template "comp.html" . }}
-{{ end }}
+	{{ range .past }}
+		{{ template "comp.html" . }}
+	{{ end }}
 
 {{ end }}
 

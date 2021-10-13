@@ -162,6 +162,8 @@ func main() {
 		})
 		adminRoutes.GET("/add", manualScore)
 		adminRoutes.POST("/add", processManualScore)
+		adminRoutes.GET("/attendance", allAttendance)
+		adminRoutes.GET("/attendance/:id", eventAttendance)
 	}
 
 	r.Run(":1337")

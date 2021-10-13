@@ -1,4 +1,4 @@
-{{ template "had.html" . }}
+{{ template "head.html" . }}
 
 <fieldset style="display: flex; justify-content: flex-center;">
     <legend><h1>Add a New Competition</h1></legend>
@@ -7,6 +7,14 @@
             <div class="row">
                 <label for="title">Competition Title</label>
                     <input type="text" name="title" placeholder="Competition Title"></input>
+            </div>
+            <div class="row">
+                <label>vApp</label>
+                <input type="text" name="vapp"></input>
+            </div>
+            <div class="row">
+                <label>VApp Optional</label>
+                <input type="checkbox" name="disable"></textarea>
             </div>
             <div class="row">
                 <label>Signups Open</label>

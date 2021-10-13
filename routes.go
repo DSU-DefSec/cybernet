@@ -46,8 +46,16 @@ func joinEvent(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": err}))
 		return
 	}
+
+	var event = &Event{}
+	result := db.First(event, "id = ?", id)
+	if result.Error != nil {
+		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": err}))
+		return
+	}
+
 	signup := &SignUp{}
-	result := db.Limit(1).Find(signup, "event_id = ? and user = ?", id, user.Username)
+	result = db.Limit(1).Find(signup, "event_id = ? and user = ?", id, user.Username)
 	if result.Error != nil {
 		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": result.Error}))
 		return
@@ -64,7 +72,8 @@ func joinEvent(c *gin.Context) {
 	}
 
 	signup = &SignUp{
-		User: user.Username,
+		Time:    time.Now(),
+		User:    user.Username,
 		EventID: uint(id),
 	}
 	result = db.Create(signup)
@@ -73,7 +82,7 @@ func joinEvent(c *gin.Context) {
 		return
 	}
 
-	apiDeploy("2021-CyberStorm-MobPsycho", []string{user.IALab})
+	apiDeploy(event.VApp, "DefSec_Lessons", []string{user.IALab})
 
 	c.HTML(http.StatusOK, "index.html", pageData(c, "Scoreboard", gin.H{"message": "Sign up successful!"}))
 }
@@ -138,6 +147,7 @@ func setConfig(c *gin.Context) {
 		return
 	}
 
+	secrets = append(secrets, createdSecret)
 	c.HTML(http.StatusOK, "config.html", pageData(c, "Configuration", gin.H{"secrets": secrets}))
 }
 
@@ -179,6 +189,84 @@ func saveInitialSetup(c *gin.Context) {
 		}
 	}
 	c.Redirect(http.StatusSeeOther, "/login")
+}
+func allAttendance(c *gin.Context) {
+	var allAttendance []Attendance
+
+	var events []Event
+	result := db.Find(&events)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": result.Error})
+		return
+	}
+
+	for _, event := range events {
+		var signups []SignUp
+		result := db.Find(&signups, "event_id = ?", event.ID)
+		if result.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": result.Error})
+			return
+		}
+
+		attendance := Attendance{
+			Event: event.Title,
+		}
+
+		for _, signup := range signups {
+			var user User
+			result = db.First(&user, "username = ?", signup.User)
+			if result.Error != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": result.Error})
+				return
+			}
+			attendance.Attendees = append(attendance.Attendees, Attendee{
+				Time:     signup.Time,
+				Username: user.IALab,
+			})
+		}
+		allAttendance = append(allAttendance, attendance)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"events": allAttendance})
+}
+
+func eventAttendance(c *gin.Context) {
+	var signups []SignUp
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+	result := db.Find(&signups, "event_id = ?", id)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": result.Error})
+		return
+	}
+
+	var event Event
+	result = db.Find(&event, "id = ?", id)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": result.Error})
+		return
+	}
+
+	attendance := Attendance{
+		Event: event.Title,
+	}
+
+	for _, signup := range signups {
+		var user User
+		result = db.First(&user, "username = ?", signup.User)
+		if result.Error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": result.Error})
+			return
+		}
+		attendance.Attendees = append(attendance.Attendees, Attendee{
+			Time:     signup.Time,
+			Username: user.IALab,
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{"attendance": attendance})
 }
 
 func pageData(c *gin.Context, title string, ginMap gin.H) gin.H {

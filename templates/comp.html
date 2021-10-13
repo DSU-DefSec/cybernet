@@ -40,7 +40,6 @@
             {{ .Title }}
         </td>
     </tr>
-     -->
     {{ if .Notes }}
     <tr>
         <td>
@@ -51,6 +50,7 @@
         </td>
     </tr>
     {{ end }}
+	-->
 
     {{ if .LinkOne }}
     <tr>
@@ -73,12 +73,29 @@
         </td>
     </tr>
     {{ end }}
+    {{ if .VApp }}
     <tr>
         <td>
             Join!
         </td>
         <td>
+            <a href="/join/{{ .ID  }}">Join and Deploy</a>
+        </td>
+    </tr>
+    {{ end }}
+    {{ if or (not .VApp) .VAppOptional }}
+    <tr>
+        <td>
+	    {{ if .VApp }}
+            Attend (do NOT deploy vApp)
+	    {{ else }}
+            Attend
+	    {{ end }}
+        </td>
+        <td>
             <a href="/join/{{ .ID  }}">Join</a>
         </td>
     </tr>
+    {{ end }}
 </table>
+

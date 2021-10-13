@@ -23,11 +23,12 @@ type User struct {
 type Event struct {
 	ID           uint
 	Title        string    `form:"title"`
+	VAppOptional bool      `form:"optional"`
+	VApp         string    `form:"vapp"`
 	SignupsOpen  time.Time `form:"signupsopen"`
 	SignupsClose time.Time `form:"signupsclose"`
 	EventStart   time.Time `form:"eventstart"`
 	EventEnd     time.Time `form:"eventend"`
-	VApp         string    `form:"vapp"`
 	Notes        string    `form:"notes"`
 	LinkOne      string    `form:"linkone"`
 	LinkTwo      string    `form:"linktwo"`
@@ -35,13 +36,26 @@ type Event struct {
 
 type SignUp struct {
 	ID      uint
+	Time    time.Time
 	User    string
 	EventID uint
 }
 
 type DeployRequest struct {
-	VApp     string   `json:"vapp"`
-	Variants []string `json:"variants"`
+	Template  string   `json:"template"`
+	Catalog   string   `json:"catalog"`
+	Variants  []string `json:"variants"`
+	MakeOwner bool     `json:"make_owner"`
+}
+
+type Attendance struct {
+	Event     string     `json:"event"`
+	Attendees []Attendee `json:"attendees"`
+}
+
+type Attendee struct {
+	Time     time.Time `json:"time"`
+	Username string    `json:"username"`
 }
 
 func (u *User) IsValid() bool {
