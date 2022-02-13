@@ -18,7 +18,18 @@
         </form>
     </fieldset>
 </div>
+
+<p class="msg">
+The "secret" is meant to prevent unauthorized account creation.
 <br>
+If the presenter didn't include a secret, and you need one, please ask :)
+</p>
+
+{{ template "message.html" .message }}
+{{ template "error.html" .error }}
+
+{{ template "feet.html" }}
+
 
 {{ template "error.html" .error }}
 

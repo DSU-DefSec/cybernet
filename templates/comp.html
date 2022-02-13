@@ -1,10 +1,13 @@
 <table>
     <tr>
         <td>
-            Title
-        </td>
-        <td>
-            {{ .Title }}
+        {{ .Title }} 
+	<br>
+	{{ if not .EventStart.IsZero }}
+	<span style="font-weight: normal">
+		({{ .EventStart.Format "2006-01-02 15:04 MST" }})
+	</span>
+	{{ end }}
         </td>
     </tr>
     <!--
@@ -66,9 +69,6 @@
     {{ if .LinkTwo }}
     <tr>
         <td>
-            Link
-        </td>
-        <td>
             <a href="{{ .LinkTwo }}">{{ .LinkTwo }}</a>
         </td>
     </tr>
@@ -76,24 +76,18 @@
     {{ if .VApp }}
     <tr>
         <td>
-            Join!
-        </td>
-        <td>
-            <a href="/join/{{ .ID  }}">Join and Deploy</a>
+            <a href="/join/{{ .ID  }}">Attend and Deploy vApp</a>
         </td>
     </tr>
     {{ end }}
-    {{ if or (not .VApp) .VAppOptional }}
+    {{ if or (not .VApp) (not .VAppMandatory) }}
     <tr>
         <td>
 	    {{ if .VApp }}
-            Attend (do NOT deploy vApp)
+            <a href="/attend/{{ .ID  }}">Attend without vApp</a>
 	    {{ else }}
-            Attend
+            <a href="/attend/{{ .ID  }}">Attend</a>
 	    {{ end }}
-        </td>
-        <td>
-            <a href="/join/{{ .ID  }}">Join</a>
         </td>
     </tr>
     {{ end }}

@@ -29,45 +29,148 @@ func editProfile(c *gin.Context) {
 		return
 	}
 
-	c.ShouldBind(userProfile)
+	err := c.ShouldBind(userProfile)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "profile.html", pageData(c, "Edit Profile", gin.H{"error": err}))
+		return
+	}
+
 	result = db.Where("username = ?", username).Save(userProfile)
 	if result.Error != nil {
 		c.HTML(http.StatusBadRequest, "profile.html", pageData(c, "Edit Profile", gin.H{"error": result.Error}))
 		return
 	}
 
-	c.HTML(http.StatusBadRequest, "profile.html", pageData(c, "Edit Profile", gin.H{"message": "Successfully saved.", "userProfile": userProfile}))
+	c.HTML(http.StatusOK, "profile.html", pageData(c, "Edit Profile", gin.H{"message": "Successfully saved.", "userProfile": userProfile}))
 }
 
 func joinEvent(c *gin.Context) {
 	user := getUser(c)
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": err}))
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": err}))
 		return
 	}
 
 	var event = &Event{}
 	result := db.First(event, "id = ?", id)
 	if result.Error != nil {
-		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": err}))
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": err}))
 		return
 	}
 
 	signup := &SignUp{}
 	result = db.Limit(1).Find(signup, "event_id = ? and user = ?", id, user.Username)
 	if result.Error != nil {
-		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": result.Error}))
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": result.Error}))
 		return
 	}
 
 	if signup.User != "" {
-		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": errors.New("You already signed up!")}))
+		c.HTML(http.StatusBadRequest, "redeploy.html", pageData(c, "Events", gin.H{"event": event, "error": errors.New("You already signed up!")}))
 		return
 	}
 
 	if user.IALab == "" {
-		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": errors.New("You need to configure your IALab username!")}))
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": errors.New("You need to set your IALab username!")}))
+		return
+	} else {
+		err := apiCheckUser(user.IALab)
+		if err != nil {
+			// If the API actually responds, deny entry for invalid users
+			if err.Error() == INVALID_USER {
+				c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": errors.New("Your IALab username is not valid :( If you're sure it is, make sure you've logged in to the DefSec IALab before.")}))
+				return
+			}
+		}
+
+	}
+
+	signup = &SignUp{
+		Time:    time.Now(),
+		User:    user.Username,
+		EventID: uint(id),
+	}
+
+	result = db.Create(signup)
+	if result.Error != nil {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": result.Error}))
+		return
+	}
+
+	err = apiDeploy(event.VApp, "DefSec_Lessons", []string{user.IALab})
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": "Error deploying: " + err.Error()}))
+		return
+	}
+
+	c.HTML(http.StatusOK, "blank.html", pageData(c, "Join Event", gin.H{"message": "Sign up successful!"}))
+}
+
+func deployEvent(c *gin.Context) {
+	user := getUser(c)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": err}))
+		return
+	}
+
+	var event = &Event{}
+	result := db.First(event, "id = ?", id)
+	if result.Error != nil {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": err}))
+		return
+	}
+
+	if user.IALab == "" {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": errors.New("You need to set your IALab username!")}))
+		return
+	} else {
+		err := apiCheckUser(user.IALab)
+		if err != nil {
+			// If the API actually responds, deny entry for invalid users
+			if err.Error() == INVALID_USER {
+				c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": errors.New("Your IALab username is not valid :( If you're sure it is, make sure you've logged in to the DefSec IALab before.")}))
+				return
+			}
+		}
+
+	}
+
+	err = apiDeploy(event.VApp, "DefSec_Lessons", []string{user.IALab})
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": "Error deploying: " + err.Error()}))
+		return
+	}
+
+	c.HTML(http.StatusOK, "blank.html", pageData(c, "Join Event", gin.H{"message": "Deploy successful!"}))
+}
+
+
+func attendEvent(c *gin.Context) {
+	user := getUser(c)
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": err}))
+		return
+	}
+
+	var event = &Event{}
+	result := db.First(event, "id = ?", id)
+	if result.Error != nil {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": err}))
+		return
+	}
+
+	signup := &SignUp{}
+	result = db.Limit(1).Find(signup, "event_id = ? and user = ?", id, user.Username)
+	if result.Error != nil {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": result.Error}))
+		return
+	}
+
+	if signup.User != "" {
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": errors.New("You already signed up!")}))
 		return
 	}
 
@@ -76,15 +179,14 @@ func joinEvent(c *gin.Context) {
 		User:    user.Username,
 		EventID: uint(id),
 	}
+
 	result = db.Create(signup)
 	if result.Error != nil {
-		c.HTML(http.StatusBadRequest, "index.html", pageData(c, "Events", gin.H{"error": result.Error}))
+		c.HTML(http.StatusBadRequest, "blank.html", pageData(c, "Events", gin.H{"error": result.Error}))
 		return
 	}
 
-	apiDeploy(event.VApp, "DefSec_Lessons", []string{user.IALab})
-
-	c.HTML(http.StatusOK, "index.html", pageData(c, "Scoreboard", gin.H{"message": "Sign up successful!"}))
+	c.HTML(http.StatusOK, "blank.html", pageData(c, "Attend Event", gin.H{"message": "Sign up successful!"}))
 }
 
 func exportProfile(c *gin.Context) {
@@ -98,6 +200,7 @@ func scoreInput(c *gin.Context) {
 func manualScore(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", pageData(c, "Scoreboard", gin.H{}))
 }
+
 func processManualScore(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", pageData(c, "Scoreboard", gin.H{}))
 }
@@ -112,7 +215,22 @@ func editCompetition(c *gin.Context) {
 		comp = &Event{}
 		print(id)
 	}
-	c.ShouldBind(comp)
+
+	err = c.ShouldBind(comp)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "compdata.html", pageData(c, "Edit Competition", gin.H{"error": err}))
+		return
+	}
+
+	if comp.EventStart.IsZero() {
+		comp.EventStart = time.Now()
+	}
+
+	// Default event duration is a day
+	if comp.EventEnd.IsZero() {
+		comp.EventEnd = comp.EventStart.Add(time.Hour * 24)
+	}
+
 	result := db.Create(comp)
 	if result.Error != nil {
 		c.HTML(http.StatusBadRequest, "compdata.html", pageData(c, "Edit Competition", gin.H{"error": result.Error}))

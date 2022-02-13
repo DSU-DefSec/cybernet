@@ -1,0 +1,20 @@
+{{ template "head.html" . }}
+
+<br>
+<h2>Users</h2>
+<br>
+
+{{ template "message.html" .message }}
+{{ template "error.html" .error }}
+
+<ul>
+{{ range .users }}
+<li>
+<a href="/users/{{ .Username }}">{{ .Username }}</a> 
+	<ul>
+	<li>Email: {{ .Email }}</li>
+	<li>IALab: {{ .IALab }}</li>
+	</ul>
+</li>
+{{ end }}
+</ul>

@@ -1,0 +1,11 @@
+{{ template "head.html" . }}
+
+<br>
+{{ template "message.html" .message }}
+{{ template "error.html" .error }}
+
+<p class="msg">
+	<a href="/deploy/{{ .event.ID }}">Shut up and deploy it again.</a>
+</p>
+
+{{ template "feet.html" }}

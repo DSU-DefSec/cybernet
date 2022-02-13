@@ -23,8 +23,8 @@ type User struct {
 type Event struct {
 	ID           uint
 	Title        string    `form:"title"`
-	VAppOptional bool      `form:"optional"`
 	VApp         string    `form:"vapp"`
+	VAppMandatory bool     `form:"mandatory"`
 	SignupsOpen  time.Time `form:"signupsopen"`
 	SignupsClose time.Time `form:"signupsclose"`
 	EventStart   time.Time `form:"eventstart"`

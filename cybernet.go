@@ -59,7 +59,6 @@ func main() {
 
 			comps := []Event{}
 			active := []Event{}
-			past := []Event{}
 
 			result := db.Order("event_start asc").Find(&comps)
 			if result.Error != nil {
@@ -68,14 +67,11 @@ func main() {
 			}
 
 			for _, comp := range comps {
-				if comp.EventEnd.Before(now) {
-					past = append(active, comp)
-				} else {
+				if !comp.EventEnd.Before(now) {
 					active = append(active, comp)
 				}
-
 			}
-			c.HTML(http.StatusOK, "index.html", pageData(c, "Events", gin.H{"active": active, "past": past}))
+			c.HTML(http.StatusOK, "index.html", pageData(c, "Events", gin.H{"active": active}))
 		})
 		publicRoutes.GET("/login", func(c *gin.Context) {
 			if getUser(c).IsValid() {
@@ -99,6 +95,15 @@ func main() {
 	authRoutes.Use(authRequired)
 	{
 		authRoutes.GET("/logout", logout)
+		authRoutes.GET("/users", func(c *gin.Context) {
+			users := []User{}
+			result := db.Find(&users)
+			if result.Error != nil {
+				c.HTML(http.StatusOK, "users.html", pageData(c, "Users", gin.H{"error": result.Error}))
+				return
+			}
+			c.HTML(http.StatusOK, "users.html", pageData(c, "Users", gin.H{"users": users}))
+		})
 		authRoutes.GET("/users/:username", func(c *gin.Context) {
 			username := c.Param("username")
 			var userProfile = &User{}
@@ -133,6 +138,8 @@ func main() {
 			c.HTML(http.StatusOK, "index.html", pageData(c, "Events", gin.H{"event": event, "attendees": attendees}))
 		})
 		authRoutes.GET("/join/:id", joinEvent)
+		authRoutes.GET("/deploy/:id", deployEvent)
+		authRoutes.GET("/attend/:id", attendEvent)
 		authRoutes.GET("/export/:id", exportProfile)
 	}
 

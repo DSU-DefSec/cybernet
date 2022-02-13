@@ -140,8 +140,8 @@ func authRequired(c *gin.Context) {
 func adminRequired(c *gin.Context) {
 	user := getUser(c)
 	if !user.Admin {
-		c.Redirect(http.StatusSeeOther, "/login")
 		errorOutAnnoying(c, errors.New("Non-admin user tried to access admin endpoint."))
+		c.Abort()
 		return
 	}
 	c.Next()
