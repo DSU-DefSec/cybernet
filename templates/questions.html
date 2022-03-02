@@ -1,19 +1,12 @@
 {{ template "head.html" . }}
-    <form style="margin-top: 2rem" method="POST">
-        <div class="row">
-                <label>Ask your question!
-                    <input required style="font-weight: normal" class="u-full-width" type="text" minlength="1" maxlength="100" placeholder="Write your question here!" id="text" name="text">
-                </label>
-            <input class="button-primary" type="submit" value="Ask">
-            &nbsp; <i>{{ .message }}</i>
-        </div>
+    <p class="msg">Ask your question!</p>
+    <form method="POST">
+            <input required style="font-weight: normal" type="text" minlength="1" maxlength="100" placeholder="Write your question here!" id="text" name="text">
+            <input type="submit" value="Ask">
     </form>
+    <p class="msg"><i>{{ .message }}</i></p>
     {{ if .user.IsValid }}
-        <meta http-equiv="refresh" content="6">
-        <br>
-        <h2>Questions</h2>
-        <br>
-        <br>
+        <meta http-equiv="refresh" content="10">
         {{ range $index, $question := .questions }}
             {{ $question.Ip }} - {{ $question.Time.Format "03:04:05 PM" }}:
             <h4><b>{{ $question.Text }}</b></h4>
