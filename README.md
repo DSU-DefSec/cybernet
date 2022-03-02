@@ -12,11 +12,3 @@ cd cybernet
 go build
 ./cybernet
 ```
-
-## Screenshots
-
-![Main Status Page](screenshots/status.png)
-
-
-## API
-
