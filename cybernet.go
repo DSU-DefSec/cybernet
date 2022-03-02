@@ -18,7 +18,14 @@ var (
 	location, _ = time.LoadLocation("America/Rainy_River")
 	locString   = "CT"
 	db          = &gorm.DB{}
+	questions   = []question{}
 )
+
+type question struct {
+	Time time.Time
+	Ip   string
+	Text string
+}
 
 func main() {
 
@@ -89,6 +96,20 @@ func main() {
 		})
 		publicRoutes.POST("/register", register)
 		publicRoutes.POST("/login", login)
+		publicRoutes.GET("/questions", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "questions.html", pageData(c, "Questions", gin.H{"questions": questions}))
+		})
+		publicRoutes.POST("/questions", func(c *gin.Context) {
+			message := "Question successfully submitted!"
+			c.Request.ParseForm()
+			questionText := c.Request.Form.Get("text")
+			if questionText == "" || len(questionText) > 150 {
+				message = "Question was empty or too long!"
+			} else {
+				questions = append([]question{{time.Now(), c.ClientIP(), questionText}}, questions...)
+			}
+			c.HTML(http.StatusOK, "questions.html", pageData(c, "Questions", gin.H{"questions": questions, "message": message}))
+		})
 	}
 
 	authRoutes := publicRoutes.Group("/")
